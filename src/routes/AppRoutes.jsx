@@ -14,11 +14,13 @@ import { Route, Routes } from "react-router-dom";
 import Login from "../pages/auth/Login";
 import Blogs from "../pages/public/Blogs";
 import BlogDetail from "../pages/public/BlogDetail";
+import Register from "../pages/auth/Register";
 
 const AppRoutes = () => (
   <Routes>
     {/* Public Pages */}
     <Route path="/login" element={<Login />} />
+    <Route path="/register" element={<Register/>} />
     <Route element={<PublicLayout />}>
       <Route path="/" element={<Home />} index />
       <Route path="/home" element={<Home />} />
