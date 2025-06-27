@@ -9,6 +9,8 @@ const PublicLayout = () => {
       <Header />
       <Outlet />
       {/* <Footer /> */}
+      <Footer />
+
     </div>
   );
 };

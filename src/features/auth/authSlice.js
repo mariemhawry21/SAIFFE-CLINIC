@@ -1,9 +1,9 @@
-
-
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
-
+// -------------------
+// Login
+// -------------------
 export const loginUser = createAsyncThunk(
   "auth/loginUser",
   async (userData, { rejectWithValue }) => {
@@ -12,32 +12,28 @@ export const loginUser = createAsyncThunk(
         "http://localhost:3000/auth/login",
         userData
       );
+
       const { user, token } = response.data.data;
       localStorage.setItem("user", JSON.stringify(user));
-      localStorage.setItem("token", token); 
-      return response.data;
+      localStorage.setItem("token", token);
+      return { user, token };
     } catch (error) {
       let errorMessage = "An unknown error occurred. Please try again.";
-
       const serverMessage = error.response?.data?.message;
-
       if (serverMessage) {
         errorMessage = serverMessage;
       } else if (error.message) {
-        errorMessage = error.message; 
+        errorMessage = error.message;
       }
-
-      console.error(
-        "[Login Error]",
-        error.response?.data || error.message || error
-      );
-
+      console.error("[Login Error]", error.response?.data || error.message || error);
       return rejectWithValue(errorMessage);
     }
   }
 );
 
-
+// -------------------
+// Register
+// -------------------
 export const registerUser = createAsyncThunk(
   "auth/registerUser",
   async (userData, { rejectWithValue }) => {
@@ -56,7 +52,6 @@ export const registerUser = createAsyncThunk(
       );
 
       const { user, token } = response.data.data;
-
       localStorage.setItem("user", JSON.stringify(user));
       localStorage.setItem("token", token);
 
@@ -68,23 +63,26 @@ export const registerUser = createAsyncThunk(
       if (serverMessage === "Email already exists") {
         errorMessage = "This email is already registered.";
       } else if (serverMessage && serverMessage.includes("is not allowed")) {
-        errorMessage =
-          "Registration failed. Please check your input (e.g., correct field names).";
+        errorMessage = "Registration failed. Please check your input (e.g., correct field names).";
       }
       return rejectWithValue(errorMessage);
     }
   }
 );
 
+// -------------------
+// Slice
+// -------------------
 const authSlice = createSlice({
   name: "auth",
   initialState: {
-
     user: (() => {
       const storedUser = localStorage.getItem("user");
       if (storedUser && storedUser !== "undefined") {
         try {
-          return JSON.parse(storedUser);
+          const user = JSON.parse(storedUser);
+          console.log("Loaded user from localStorage:", user);
+          return user;
         } catch (e) {
           console.error("Error parsing user from localStorage:", e);
           localStorage.removeItem("user");
@@ -112,7 +110,7 @@ const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // Login cases
+      // Login
       .addCase(loginUser.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -120,23 +118,24 @@ const authSlice = createSlice({
       .addCase(loginUser.fulfilled, (state, action) => {
         state.loading = false;
         state.user = action.payload.user;
-        state.token = action.payload.access_token; 
-
+        state.token = action.payload.token;
         state.isAuthenticated = true;
+        console.log("Login successful, user:", action.payload.user);
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || "Login failed";
         state.isAuthenticated = false;
       })
-      // Register cases
+
+      // Register
       .addCase(registerUser.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(registerUser.fulfilled, (state, action) => {
         state.loading = false;
-        state.user = action.payload.user; 
+        state.user = action.payload.user;
         state.token = action.payload.token;
         state.isAuthenticated = true;
       })

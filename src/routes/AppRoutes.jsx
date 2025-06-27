@@ -1,4 +1,4 @@
-// routes/AppRoutes.jsx
+// src/routes/AppRoutes.jsx
 import ProtectedRoute from "../components/shared/ProtectedRoute";
 import Home from "../pages/public/Home";
 import About from "../pages/public/About";
@@ -18,12 +18,12 @@ import Register from "../pages/auth/Register";
 
 const AppRoutes = () => (
   <Routes>
-    {/* Public Pages */}
     <Route path="/login" element={<Login />} />
-    <Route path="/register" element={<Register/>} />
+    <Route path="/register" element={<Register />} />
+    
     <Route element={<PublicLayout />}>
-      <Route path="/" element={<Home />} index />
-      <Route path="/home" element={<Home />} />
+      <Route index element={<Home />} />
+      <Route path="home" element={<Home />} />
       <Route path="about" element={<About />} />
       <Route path="doctors" element={<Doctors />} />
       <Route path="doctor/:id" element={<DoctorProfile />} />
@@ -32,11 +32,17 @@ const AppRoutes = () => (
       <Route path="specials/:id" element={<SpecialDoctor />} />
       <Route path="blogs" element={<Blogs />} />
       <Route path="blogs/:id" element={<BlogDetail />} />
-      <Route element={<ProtectedRoute />}>
-        <Route path="/profile" element={<PatientProfile />} />
-        <Route path="/book" element={<Book />} />
-      </Route>
+      <Route path="patient-profile" element={<PatientProfile />} />
+      <Route path="book" element={<Book />} />
+      {/* Protected Routes */}
+      {/* <Route element={<ProtectedRoute allowedRoles={['Patient']} />}>
+        <Route path="patient-profile" element={<PatientProfile />} />
+        <Route path="book" element={<Book />} />
+      </Route> */}
     </Route>
+    
+    <Route path="*" element={<Home />} />
   </Routes>
 );
+
 export default AppRoutes;
